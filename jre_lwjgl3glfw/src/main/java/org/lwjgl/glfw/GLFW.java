@@ -898,9 +898,9 @@ public class GLFW
     }
 
     public static int glfwGetWindowAttrib(@NativeType("GLFWwindow *") long window, int attrib) {
-        if (attrib == GLFW_CONTEXT_VERSION_MAJOR) return 4; // TODO: report actual GL version or add an option for users to select the version
-        if (attrib == GLFW_CONTEXT_VERSION_MINOR) return 6;
-		return internalGetWindow(window).windowAttribs.getOrDefault(attrib, 0);
+        if (attrib == GLFW_CONTEXT_VERSION_MAJOR) return GLFW_VERSION_MAJOR;
+        if (attrib == GLFW_CONTEXT_VERSION_MINOR) return GLFW_VERSION_MINOR;
+        return internalGetWindow(window).windowAttribs.getOrDefault(attrib, 0);
     }
 
     public static void glfwSetWindowAttrib(@NativeType("GLFWwindow *") long window, int attrib, int value) {
@@ -1178,9 +1178,6 @@ public class GLFW
     }
 
     public static int glfwGetKey(@NativeType("GLFWwindow *") long window, int key) {
-		// This is jank, anything asking for int 348 results in an IndexOutOfBounds because idk.
-        // Probably an off-by-one error. This is the 'fix'
-        if (key == GLFW_KEY_LAST){return GLFW_KEY_LAST;}
         return keyDownBuffer.get(Math.max(0, key-31));
     }
 
@@ -1428,8 +1425,7 @@ public class GLFW
     public static boolean glfwExtensionSupported(@NativeType("char const *") CharSequence ext) {
         //return Arrays.stream(glGetString(GL_EXTENSIONS).split(" ")).anyMatch(ext::equals);
         // Fast path, but will return true if one has the same prefix
-        String string = glGetString(GL_EXTENSIONS);
-        return string != null && string.contains(ext);
+        return glGetString(GL_EXTENSIONS).contains(ext);
     }
 
     /**
@@ -1472,8 +1468,4 @@ public class GLFW
 
     public static void glfwMaximizeWindow(@NativeType("GLFWwindow *") long window) {
     }
-
-	public static void glfwRestoreWindow(@NativeType("GLFWwindow *") long window) {
-	}
-
 }
